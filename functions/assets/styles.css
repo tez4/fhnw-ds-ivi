@@ -1,0 +1,41 @@
+/* styles.css */
+
+
+/* Style all input boxes */
+input {
+    border: 1px solid #ccc;
+    border-radius: 4px; /* Rounded edges */
+    padding: 10px; /* Some padding */
+    margin: 5px 0; /* Some margin */
+    box-sizing: border-box; /* To include padding and border in element's total width and height */
+}
+
+/* Style all buttons */
+button {
+    background-color: #4CAF50; /* Green background */
+    border: none;
+    color: white; /* White text */
+    padding: 10px 20px; /* Some padding */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 5px 2px;
+    transition-duration: 0.4s; /* Transition effect */
+    cursor: pointer;
+    border-radius: 4px; /* Rounded edges */
+}
+
+/* Change background color of buttons on hover */
+button:hover {
+    background-color: #45a049;
+}
+
+/* Style all select boxes */
+.dash-dropdown {
+    padding: 5px; /* Some padding */
+    margin: 5px 10px; /* Some margin */
+    box-sizing: border-box; /* To include padding and border in element's total width and height */
+    width: 100%; /* Full width */
+    outline: none; /* Remove outline */
+}
