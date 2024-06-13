@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "okara-ap2"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.2"
+numpy = "^1.26.4"
+python-dotenv = "^1.0.1"
+seaborn = "^0.13.2"
+plotly = "^5.22.0"
+nbformat = "^5.10.4"
+dash = "^2.17.0"
+dash-bootstrap-components = "^1.6.0"
+scipy = "^1.13.1"
+scikit-learn = "^1.5.0"
+xlsxwriter = "^3.2.0"
+numexpr = "^2.10.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

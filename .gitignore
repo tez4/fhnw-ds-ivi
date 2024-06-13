@@ -1,3 +1,5 @@
 **/.ipynb_checkpoints/**
 /output/**
 **/__pycache__/**
+poetry.lock
+.env
