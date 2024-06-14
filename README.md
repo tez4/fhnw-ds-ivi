@@ -2,6 +2,10 @@
 
 Dashboard implementation for the Interactive Visualization (ivi) course at FHNW.
 
+
+This is a rotating gif from my bachelor thesis:
+![Rotating gif](assets/rotating.gif)
+
 ## Install Repository Dependencies
 
 ``` bash
