@@ -56,7 +56,7 @@ class DashApp:
                             ], width=8)
                         ])
                     ]),
-                    dcc.Tab(label='View and Delete Metadata', children=[
+                    dcc.Tab(label='Metadata', children=[
                         html.Div([
                             dash_table.DataTable(
                                 style_table={
@@ -71,57 +71,8 @@ class DashApp:
                                 editable=False,
                                 filter_action="native",
                                 sort_action="native"
-                            ),
-                            html.Button('Delete Selected Rows', id='delete-button', n_clicks=0)
+                            )
                         ])
-                    ]),
-                    dcc.Tab(label='Calculate', children=[
-                        self.create_measurement_selection(),
-                        html.Div(
-                            id='calculate-selected',
-                            style={'margin': '10px'}
-                        ),
-                        html.Hr(),
-                        dbc.Row([
-                            dbc.Col([
-                                html.Label('Enter an expression using column names', style={'align': 'center'}),
-                            ], width=3),
-                            dbc.Col([
-                                dcc.Input(
-                                    id='calculate-expression',
-                                    type='text',
-                                    value='',
-                                    placeholder='Enter expression here (e.g. (m_0 + m_1) * m_2)',
-                                    style={'width': '100%'}
-                                ),
-                            ], width=4),
-                            dbc.Col([
-                                dcc.Input(
-                                    id='calculate-start-date-input',
-                                    type='text',
-                                    placeholder='Enter preview start date (YYYY-MM-DD)',
-                                    value='2023-01-01',
-                                    style={'marginRight': '10px', 'width': '100%'}
-                                )
-                            ], width=2),
-                            dbc.Col([
-                                dcc.Input(
-                                    id='calculate-end-date-input',
-                                    type='text',
-                                    placeholder='Enter preview end date (YYYY-MM-DD)',
-                                    value='2023-03-01',
-                                    style={'marginRight': '10px', 'width': '100%'}
-                                )
-                            ], width=2),
-                            dbc.Col([
-                                html.Button(
-                                    'Calculate',
-                                    id='calculate-button',
-                                    style={'marginRight': '10px', 'width': '100%'}
-                                ),
-                            ], width=1)
-                        ]),
-                        dcc.Graph(id='output-plot', config=self.plot_config)
                     ])
                 ])
             ]
@@ -137,16 +88,6 @@ class DashApp:
             }
             for index, row in self.meta_all.iterrows()
         ]
-
-    def create_measurement_selection(self):
-        return dbc.Row([
-            dcc.Dropdown(
-                id='calculate-measurement-dropdown',
-                options=self.dropdown_options,
-                value=self.meta_all['series_id'][0],
-                multi=True
-            )
-        ])
 
     def create_layout_selection_row(self, graph_type):
 
@@ -228,65 +169,6 @@ class DashApp:
             return line_graph, heatmap_graph, avg_day_graph
 
         @self.app.callback(
-            Output('calculate-selected', 'children'),
-            Input('calculate-measurement-dropdown', 'value')
-        )
-        def update_calculate_selection(selected_measurements):
-            df, meta = self.db.query_multiple(selected_measurements)
-
-            selection_printout = []
-            for _, row in meta.iterrows():
-                selection_printout.append(
-                    html.P([
-                        html.Strong(html.Mark(row['name'])),
-                        f": {row['object_description']} - {row['object_name']} \
-                        ({row['unit']} | {row['start_date']} - {row['end_date']} | \
-                        {row['msr']}.{row['msr_attribute']})"
-                    ])
-                )
-
-            return selection_printout
-
-        @self.app.callback(
-            Output('output-plot', 'figure'),
-            [
-                Input('calculate-button', 'n_clicks')
-            ],
-            [
-                State('calculate-measurement-dropdown', 'value'),
-                State('calculate-expression', 'value'),
-                State('calculate-start-date-input', 'value'),
-                State('calculate-end-date-input', 'value')
-            ]
-        )
-        def update_output_plot(n_clicks, selected_measurements, calculate_expression, start_date, end_date):
-            df, meta = self.db.query_multiple(selected_measurements)
-            df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
-
-            try:
-                df['calculated'] = ne.evaluate(calculate_expression, local_dict=df)
-                fig = px.line(df, x='date', y='calculated')
-                fig.update_layout(
-                    template=self.plot_template,
-                    xaxis_title='Date',
-                    yaxis_title='Calculated Value',
-                    showlegend=False
-                )
-            except Exception as e:
-                fig = {
-                    'data': [],
-                    'layout': {
-                        'title': 'Error',
-                        'annotations': [{
-                            'text': str(e),
-                            'showarrow': False
-                        }]
-                    }
-                }
-
-            return fig
-
-        @self.app.callback(
             [
                 Output('scatter-graph', 'figure'),
                 Output('bivariate-line-graph', 'figure')
@@ -312,31 +194,9 @@ class DashApp:
 
         @self.app.callback(
             [
-                Output('metadata-table', 'data'),
-                Output('metadata-table', 'selected_rows'),
-            ],
-            Input('delete-button', 'n_clicks'),
-            State('metadata-table', 'selected_rows'),
-            State('metadata-table', 'data')
-        )
-        def delete_rows(n_clicks, selected_rows, rows):
-            if n_clicks > 0:
-                # Extract the series_ids of the selected rows
-                selected_ids = [rows[i]['series_id'] for i in selected_rows]
-                for series_id in selected_ids:
-                    self.db.delete_measurements(series_id)
-
-                # Refresh the data table
-                self.meta_all = self.db.query_all_metadata()
-                return self.meta_all.to_dict('records'), []
-            return rows, []
-
-        @self.app.callback(
-            [
                 Output('univariate-measurement-dropdown', 'options'),
                 Output('bivariate-measurement-dropdown-1', 'options'),
                 Output('bivariate-measurement-dropdown-2', 'options'),
-                Output('calculate-measurement-dropdown', 'options')
             ],
             [
                 Input('metadata-table', 'data')
@@ -344,7 +204,7 @@ class DashApp:
         )
         def update_dropdown_options(data):
             options = self.generate_dropdown_options()
-            return options, options, options, options
+            return options, options, options
 
     def query_and_prepare_data(self, selected_measurement, start_date, end_date):
         meta_row = self.meta_all[self.meta_all['series_id'] == selected_measurement]
@@ -438,7 +298,14 @@ class DashApp:
         return fig
 
     def create_heatmap_graph(self, df):
-        fig = px.imshow(df, aspect='auto')
+
+        color_scale = [
+            [0.0, 'rgb(220, 240, 255)'],   # very light blue
+            [0.5, '#3366CC'],              # darker blue
+            [1.0, '#000080']               # navy
+        ]
+
+        fig = px.imshow(df, aspect='auto', color_continuous_scale=color_scale)
         fig.update_layout(
             template=self.plot_template,
             xaxis_title='Day',
