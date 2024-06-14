@@ -1,6 +1,14 @@
 /* styles.css */
 
 
+/* Style the button */
+/* #update-button {
+    color: #fff;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+} */
+
+
 /* Style all input boxes */
 input {
     border: 1px solid #ccc;
@@ -12,7 +20,7 @@ input {
 
 /* Style all buttons */
 button {
-    background-color: #4CAF50; /* Green background */
+    background-color: #3366CC; /* Green background */
     border: none;
     color: white; /* White text */
     padding: 10px 20px; /* Some padding */
@@ -28,7 +36,7 @@ button {
 
 /* Change background color of buttons on hover */
 button:hover {
-    background-color: #45a049;
+    background-color: #1749ad;
 }
 
 /* Style all select boxes */
@@ -38,4 +46,8 @@ button:hover {
     box-sizing: border-box; /* To include padding and border in element's total width and height */
     width: 100%; /* Full width */
     outline: none; /* Remove outline */
+}
+
+.tab-container > .tab--selected.jsx-1653633250 {
+    border-top: 2px solid #3366CC;
 }
